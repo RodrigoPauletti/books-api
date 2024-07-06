@@ -4,12 +4,14 @@ namespace Tests\Unit;
 
 use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use App\Models\Book;
 use App\Models\User;
 
 class BookTest extends TestCase
 {
+    use RefreshDatabase;
 
     private string $booksEndpoint = '/api/v1/books';
     private string $importBooksIndicesEndpoint = '/api/v1/books/{bookId}/import-indices-xml';

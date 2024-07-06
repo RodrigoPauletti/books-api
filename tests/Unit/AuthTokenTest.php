@@ -4,11 +4,13 @@ namespace Tests\Unit;
 
 use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use App\Models\User;
 
 class AuthTokenTest extends TestCase
 {
+    use RefreshDatabase;
 
     #[Test]
     public function it_can_retrieve_a_token(): void {
