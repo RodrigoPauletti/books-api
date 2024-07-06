@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  books_api_server:
+    restart: on-failure
+    build:
+      context: ./docker
+    volumes:
+      - .:/var/www/html
+      - ./docker/env-variables.ini:/usr/local/etc/php/conf.d/env-variables.ini
+      - ./docker/php.ini:/usr/local/etc/php/conf.d/php.ini
+    environment:
+      DB_HOST: books_api_db
+    ports:
+      - 8000:8000
+    links:
+      - books_api_db
+  books_api_db:
+    image: mariadb:latest
+    restart: on-failure
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ./dbdata:/var/lib/mysql
+    ports:
+      - 3306:3306
+  books_api_phpma:
+    image: phpmyadmin:latest
+    restart: on-failure
+    environment:
+      PMA_HOST: books_api_db
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    links:
+      - books_api_db
+    ports:
+      - 8081:80
