@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Exception;
 use DB;
 
@@ -16,13 +17,33 @@ class BookController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index() {
-        $books = Book::all();
+    public function index(Request $request) {
+        $searchByTitle = $request->input('title');
+        $searchByBookIndicesTitle = $request->input('index_title');
 
-        return response()->json([
-            'status' => true,
-            'books' => $books
-        ]);
+        try {
+            $books = Book
+                ::with([
+                    'author',
+                    'indices'
+                ])
+                ->when($searchByTitle, function ($q) use ($searchByTitle) {
+                    $q->where('title', 'LIKE', '%'.$searchByTitle.'%');
+                })
+                ->get();
+
+            if ($searchByBookIndicesTitle) {
+                $books = $books->filter(function ($book) use ($searchByBookIndicesTitle) {
+                    return $this->filterBookIndicesByTitle($book->indices, $searchByBookIndicesTitle)->isNotEmpty();
+                });
+            }
+
+            return response()->json($books, 200);
+        } catch (Exception $exception) {
+            return response()->json([
+                'message' => $exception->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -45,8 +66,7 @@ class BookController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Book successfully created!',
-                'book' => $book
-            ], 200);
+            ], 201);
         } catch (Exception $exception) {
             DB::rollBack();
 
@@ -72,6 +92,17 @@ class BookController extends Controller
                 $this->createBookIndices($bookId, $subindices, $newBookIndex->id);
             }
         }
+    }
+
+    private function filterBookIndicesByTitle($bookIndices, $title) {
+        return $bookIndices->filter(function ($bookIndex) use ($title) {
+            if (stripos($bookIndex->title, $title) !== false) {
+                return true;
+            }
+
+            // Recursively check subindices
+            return $this->filterBookIndicesByTitle($bookIndex->subindices, $title)->isNotEmpty();
+        });
     }
 
 }

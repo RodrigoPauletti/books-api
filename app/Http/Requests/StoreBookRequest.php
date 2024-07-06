@@ -23,7 +23,6 @@ class StoreBookRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'author_id' => ['required', 'exists:users,id'],
             'title' => ['required', 'string', 'max:255'],
             'indices' => ['required', 'array', new BookIncidesRule]
         ];

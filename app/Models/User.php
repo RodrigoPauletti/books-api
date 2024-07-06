@@ -23,6 +23,8 @@ class User extends Authenticatable
         'password',
     ];
 
+    protected $visible = ['id', 'name'];
+
     /**
      * The attributes that should be hidden for serialization.
      *
