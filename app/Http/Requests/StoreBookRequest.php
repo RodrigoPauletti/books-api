@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\Validator;
+use App\Rules\BookIncidesRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreBookRequest extends FormRequest
@@ -25,6 +25,7 @@ class StoreBookRequest extends FormRequest
         return [
             'author_id' => ['required', 'exists:users,id'],
             'title' => ['required', 'string', 'max:255'],
+            'indices' => ['required', 'array', new BookIncidesRule]
         ];
     }
 

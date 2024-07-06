@@ -5,8 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Book extends Model {
+class BookIndex extends Model {
     use HasFactory;
 
-    protected $fillable = ['author_id', 'title'];
+    protected $fillable = ['book_id', 'book_index_id', 'title', 'page'];
+
 }
