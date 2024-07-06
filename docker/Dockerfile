@@ -28,4 +28,4 @@ WORKDIR /var/www/html
 STOPSIGNAL SIGKILL
 
 # Start application server (if the vendor folder don't exists, execute 'composer install')
-# CMD . "$HOME/.bashrc"; test -d ./vendor || composer install; php artisan serve --host=0.0.0.0
+CMD . "$HOME/.bashrc"; test -d ./vendor || composer install; php artisan serve --host=0.0.0.0
