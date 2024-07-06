@@ -11,6 +11,7 @@ use DB;
 use App\Models\Book;
 use App\Models\BookIndex;
 use App\Http\Requests\StoreBookRequest;
+use App\Jobs\ImportXmlJob;
 
 class BookController extends Controller
 {
@@ -66,6 +67,38 @@ class BookController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Book successfully created!',
+            ], 201);
+        } catch (Exception $exception) {
+            DB::rollBack();
+
+            return response()->json([
+                'message' => $exception->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Import book's indices to storage.
+     */
+    public function importIndices(Request $request) {
+        DB::beginTransaction();
+        try {
+            $bookId = $request->segment(4);
+
+            if (!Book::whereId($bookId)->count()) {
+                throw new Exception('Book not found!');
+            }
+
+            BookIndex::whereBookId($bookId)->delete();
+
+            $xmlContent = $request->getContent();
+            ImportXmlJob::dispatch($bookId, $xmlContent);
+
+            DB::commit();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Indices\' job successfully dispatched!',
             ], 201);
         } catch (Exception $exception) {
             DB::rollBack();

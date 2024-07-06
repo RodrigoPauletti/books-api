@@ -11,6 +11,7 @@ Route::prefix('v1')->group(function () {
         Route::controller(BookController::class)->prefix('/books')->group(function () {
             Route::get('', 'index');
             Route::post('', 'store');
+            Route::post('{bookId}/import-indices-xml', 'importIndices');
         });
     });
 });
